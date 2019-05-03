@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html class="no-js"><!--<![endif]-->
+<head>
+<meta name="theme-color" content="#e54f3f">
+<script type="text/javascript">
+if(!(navigator.userAgent.indexOf("Firefox") > -1)) {
+	var manifestAdd = document.createElement('link');
+	manifestAdd.rel = "manifest";
+	manifestAdd.href = "/manifest.json";
+	var findScriptTag = document.getElementsByTagName('script')[0];
+      findScriptTag.parentNode.insertBefore(manifestAdd, findScriptTag);
+}
+</script>
+<script>
+detectMobileDesktop = function() {
+	var browserAgent = navigator.userAgent,
+		browserReg = new RegExp(["IEMobile|Windows Phone|Lumia|iPhone|iP[oa]d|", "Android|BlackBerry|PlayBook|BB10|Mobile Safari|webOS|", "Mobile|Tablet|Opera Mini|CrMo|Opera Mobi"].join(""),"i"),
+		mobieAvailable = browserReg.test(browserAgent);
+
+	return mobieAvailable ? "mobile" : "desktop"
+}
+var browserType = detectMobileDesktop();
+
+if("serviceWorker"in navigator && browserType === "mobile" && !(navigator.userAgent.indexOf("Firefox") > -1)) {
+	navigator.serviceWorker.register("/service-worker.js").then(function(mobieAvailable) {
+		console.log("service-worker registered for user agent - " + browserType)
+	}).catch(function(err) {
+		console.log("ServiceWorker failed 😢", err)
+	})
+} else if(browserType === "desktop") {
+	navigator.serviceWorker.getRegistration().then(function(registration) {
+		var serviceWorkerUnregistered=false;
+		if(registration) {
+			registration.unregister();
+			serviceWorkerUnregistered=true;
+			caches.keys().then(function(keyList) {
+				keyList.forEach(function(cache){
+					caches.delete(cache)
+				})
+			})
+			console.log("Service worker unregistered and all cache cleared")
+		}
+		serviceWorkerUnregistered && window.location.reload();
+	});
+} else {
+	console.log("Service worker not supported")
+}
+
+window.addEventListener('load', function() {
+  var networkStatus = document.createElement("div");
+  networkStatus.setAttribute("id","networkStatus");
+  document.body.appendChild(networkStatus);
+
+  var onlineOfflineStatus = true;
+
+  function updateOnlineStatus(event) {
+    document.getElementById("networkStatus").style.display = "block";
+    var condition, statusClass;
+    navigator.onLine ? (statusClass = 'online', condition = 'Internet is Back!', onlineOfflineStatus = false) : (statusClass = 'offline', condition = 'No Internet Connection')
+
+    networkStatus.className = statusClass;
+    networkStatus.innerHTML = condition;
+    document.getElementById("networkStatus").style.display = "block";
+	if (document.querySelector("#footerFixed") != null && document.querySelector("#footerFixed").style.transform != "translateY(0px)") {
+		networkStatus.style.transform = "translateY(-56px)";
+	}
+    navigator.onLine ? setTimeout(hideNetworkStatus, 5000) : null;
+  }
+
+  function hideNetworkStatus() {
+    document.getElementById("networkStatus").style.display = "none";
+  }
+  window.addEventListener('online',  updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+
+  if(navigator.onLine === false && onlineOfflineStatus === true) {
+    updateOnlineStatus()
+    onlineOfflineStatus = true;
+  }
+
+  var networkStatusScollPosition2 = 0;
+
+  window.onscroll = function() {
+    if ( networkStatusScollPosition2 > $(window).scrollTop()) {
+	  networkStatus.style.transform = "translateY(-56px)";
+    } else {
+	  networkStatus.style.transform = "translateY(0)";
+    }
+    networkStatusScollPosition2 = $(window).scrollTop();
+  }
+});
+</script>
+</head>
+<body>
+  <h1>Marmik Desai</h1>
+	<img src="/logo.png">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/16.8.6/umd/react.production.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react-router/5.0.0/react-router.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r84/three.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/d3js/5.7.0/d3.min.js"></script>
+<script src="https://unpkg.com/@material-ui/core/umd/material-ui.production.min.js"></script>
+</body>
+</html>
