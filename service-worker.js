@@ -13,13 +13,6 @@ self.addEventListener('activate', event => {
 	event.waitUntil(clients.claim());
 });
 
-self.toolbox.router.get('/', toolbox.cacheFirst, {
-  cache: {
-    name: 'toolbox-image',
-    maxEntries: 250
-  }
-});
-
 self.toolbox.router.get(/^https:\/\/ajax.googleapis.com\//, toolbox.cacheFirst, {
   cache: {
     name: 'toolbox-googleapis',
